@@ -1,10 +1,10 @@
 - [ ] Write it with component local state
     - [x] handle editing in `TodoItem`
         - [x] check that `onRename` works
-    - [ ] use the callbacks for `onToggle` & `onDestroy`
+    - [x] use the callbacks for `onToggle` & `onDismiss`
     - [ ] filter by state
         - [ ] controls
-        - [ ] `items.filter()`
+        - [x] `items.filter()`
 
 - [ ] Write adapter (or at least container)
 - [ ] Add CSS Modules

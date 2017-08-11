@@ -1,17 +1,18 @@
 ///<reference path="model.d.ts"/>
 import * as React from 'react';
 import autobind from 'autobind-decorator';
-import { Key } from 'ts-keycode-enum';
-import { uuid } from './Utils';
+import { uniqueId } from 'lodash';
 
-import { TodoItem } from './TodoItem';
+import { SearchForm } from './SearchForm';
+import { ItemList } from './ItemList';
 
-type ItemPropsPartial = {
-    [key in keyof TodoItemProps]?: TodoItemProps[key];
-};
+export interface State {
+    items: TodoItemDic;
+    searchText: string;
+}
 
-export class TodoList extends React.Component<TodoListProps, TodoListState> {
-    constructor(props: TodoListProps) {
+export class TodoManager extends React.Component<{}, State> {
+    constructor(props: {}) {
         super(props);
 
         this.state = {
@@ -37,39 +38,23 @@ export class TodoList extends React.Component<TodoListProps, TodoListState> {
     }
 
     render() {
-        const itemsList =
-            Object.keys(this.state.items)
-                .map(id => this.state.items[id]);
+        const itemList = Object.keys(this.state.items)
+            .map(id => this.state.items[id])
+            .filter(this.itemsFilter);
 
         return (
             <div className="b-todo-list">
-                <header className="b-todo-list__header">
-                    <input
-                        type="text"
-                        className="b-todo-list__search"
-                        value={this.state.searchText}
-                        placeholder="Type away, baby"
-                        autoFocus={true}
-                        onChange={this.handleSearchTyping}
-                        onKeyDown={this.handleSearchKeyDown}
-                    />
-                </header>
-                <ul className="b-todo-list__items">
-                    {itemsList
-                        .filter(this.itemsFilter)
-                        .map(item =>
-                            <TodoItem
-                                key={item.id}
-                                id={item.id}
-                                title={item.title}
-                                done={item.done}
-                                onRename={this.handleItemRename}
-                                onToggle={this.handleItemToggle}
-                                onDestroy={this.handleItemDestroy}
-                            />
-                        )
-                    }
-                </ul>
+                <SearchForm
+                    text={this.state.searchText}
+                    onChange={searchText => this.setState({searchText})}
+                    onSubmit={title => title && this.addItem(title)}
+                />
+                <ItemList
+                    items={itemList}
+                    onRename={this.handleItemRename}
+                    onToggle={this.handleItemToggle}
+                    onDismiss={this.handleItemDismiss}
+                />
             </div>
         );
     }
@@ -95,39 +80,20 @@ export class TodoList extends React.Component<TodoListProps, TodoListState> {
     }
 
     @autobind
-    handleItemDestroy(id: string) {
+    handleItemDismiss(id: string) {
         this.setState(state => {
-            let { [id]: dismiss, ...newItems } = state.items;
+            let { [id]: __, ...newItems } = state.items;
 
             return { items: newItems };
         });
     }
 
-    @autobind
-    handleSearchTyping(event: React.ChangeEvent<HTMLInputElement>) {
-        const input = event.target;
-        this.setState({ searchText : input.value });
-    }
-
-    @autobind
-    handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-        if (event.keyCode !== Key.Enter) {
-            return;
-        }
-
-        event.preventDefault();
-
-        const title = this.state.searchText;
-        title &&
-            this.addItem(title);
-    }
-
     private addItem(title: string) {
         this.setState(state => {
-            const id = uuid();
+            const id = uniqueId();
 
             const items = {
-                    ...state.items,
+                ...state.items,
                 [id]: {
                     id,
                     title,
@@ -144,7 +110,7 @@ export class TodoList extends React.Component<TodoListProps, TodoListState> {
 
     private updateItem(
         id: string,
-        reducer: (props: TodoItemProps) => ItemPropsPartial,
+        reducer: (props: TodoItemProps) => Partial<TodoItemProps>,
     ) {
         this.setState(state => {
             const

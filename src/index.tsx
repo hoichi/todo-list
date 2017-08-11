@@ -2,16 +2,16 @@
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import App from './app/App';
 import './index.css';
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root') as HTMLElement
-);
-registerServiceWorker();
+function render() {
+    ReactDOM.render(
+        <App />,
+        document.getElementById('root') as HTMLElement
+    );
+}
 
 if (module.hot) {
-    module.hot.accept();
+    module.hot.accept('./app/App', render);
 }

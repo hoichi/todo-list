@@ -1,17 +1,25 @@
-///<reference path="model.d.ts"/>
+///<reference path="../model.d.ts"/>
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
 import autobind from 'autobind-decorator';
 
-export class TodoItem extends React.Component<
-    TodoItemProps & TodoItemHandlers, TodoItemState
-> {
-    // Q: should the same interface describe both component state model
-    // and store submodel?
+interface PropsWithHandlers extends TodoItemProps {
+    onRename: (id: string, newTitle: string) => void;
+    onToggle: (id: string, done: boolean) => void;
+    onDismiss: (id?: string) => void;
+}
 
+interface State {
+    editing: boolean;
+    editText: string;
+}
+
+export class TodoItem extends React.Component<
+    PropsWithHandlers, State
+> {
     private textInput: HTMLInputElement | null = null;
 
-    constructor(props: TodoItemProps & TodoItemHandlers) {
+    constructor(props: PropsWithHandlers) {
         super(props);
 
         this.state = {
@@ -62,7 +70,7 @@ export class TodoItem extends React.Component<
 
                     <button
                         className="b-todo-item__destroy"
-                        onClick={e => props.onDestroy(props.id)}
+                        onClick={e => props.onDismiss(props.id)}
                     />
                 </div>
 
@@ -84,7 +92,7 @@ export class TodoItem extends React.Component<
         );
     }
 
-    componentDidUpdate(__: TodoItemProps, state: TodoItemState) {
+    componentDidUpdate(__: TodoItemProps, state: State) {
         const
             input = this.textInput,
             isStartingEdit = !state.editing && this.state.editing;
