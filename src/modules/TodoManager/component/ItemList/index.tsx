@@ -1,16 +1,20 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import { TodoItem } from './Item';
+import { TodoItem, Props as TodoItemProps } from '../Item';
 
-interface PropsWithHandlers extends TodoListProps {
+export interface Props {
+    items: TodoItemProps[];
+}
+
+export interface Handlers {
     onRename: (id: string, newTitle: string) => void;
     onToggle: (id: string, done?: boolean) => void;
     onDismiss: (id: string) => void;
 }
 
 export function ItemList(
-    props: PropsWithHandlers
-): ReactElement<PropsWithHandlers> {
+    props: Props & Handlers
+): ReactElement<Props & Handlers> {
     return (
         <ul className="b-todo-list__items">
             {props.items.map(item =>

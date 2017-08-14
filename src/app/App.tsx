@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Store } from 'redux';
 
 import './App.css';
-import { TodoManager } from '../modules/TodoManager/TodoManager';
+import TodoManager from '../modules/TodoManager';
 import { AppState } from '../store';
 
 export interface AppProps {

@@ -1,9 +1,14 @@
-///<reference path="../model.d.ts"/>
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
 import autobind from 'autobind-decorator';
 
-interface PropsWithHandlers extends TodoItemProps {
+export interface Props {
+    id: string;
+    title: string;
+    done: boolean;
+}
+
+export interface Handlers {
     onRename: (id: string, newTitle: string) => void;
     onToggle: (id: string, done: boolean) => void;
     onDismiss: (id?: string) => void;
@@ -15,11 +20,11 @@ interface State {
 }
 
 export class TodoItem extends React.Component<
-    PropsWithHandlers, State
+    Props & Handlers, State
 > {
     private textInput: HTMLInputElement | null = null;
 
-    constructor(props: PropsWithHandlers) {
+    constructor(props: Props & Handlers) {
         super(props);
 
         this.state = {
@@ -92,7 +97,7 @@ export class TodoItem extends React.Component<
         );
     }
 
-    componentDidUpdate(__: TodoItemProps, state: State) {
+    componentDidUpdate(__: Props, state: State) {
         const
             input = this.textInput,
             isStartingEdit = !state.editing && this.state.editing;

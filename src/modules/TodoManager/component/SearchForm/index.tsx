@@ -2,14 +2,17 @@ import * as React from 'react';
 import autobind from 'autobind-decorator';
 import { Key } from 'ts-keycode-enum';
 
-interface Props {
+export interface Props {
     text: string;
+}
+
+export interface Handlers {
     onChange: (text: string) => void;
     onSubmit: (text: string) => void;
 }
 
-export class SearchForm extends React.Component<Props, {}> {
-    constructor(props: Props) {
+export class SearchForm extends React.Component<Props & Handlers, {}> {
+    constructor(props: Props & Handlers) {
         super(props);
     }
 
@@ -31,14 +34,12 @@ export class SearchForm extends React.Component<Props, {}> {
 
     @autobind
     handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-        if (event.keyCode !== Key.Enter) {
-            return;
-        }
+        if (event.keyCode !== Key.Enter) { return; }
+
+        const {value} = event.target as HTMLInputElement;
+        if (!value) { return; }
 
         event.preventDefault();
-
-        this.props.onSubmit(
-            (event.target as HTMLInputElement).value
-        );
+        this.props.onSubmit(value);
     }
 }

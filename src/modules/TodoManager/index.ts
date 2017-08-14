@@ -1,46 +1,29 @@
 import { connect, Dispatch } from 'react-redux';
 
 import { AppState } from '../../store';
-import { createTodo, updateTodo, deleteTodo } from './actions';
-import { TodoManager } from './TodoManager';
-import { Action } from 'typescript-fsa';
+import { TodoItem,
+    todoCreate, todoUpdate, todoDelete } from '../../store/todos';
 
-type OwnProps = TodoManagerProps;
+import { TodoManager, Props, Handlers } from './component';
 
-type StateProps = TodoManagerProps;
+function mapStateToProps(state: AppState): Props {
+    const items = state.todos.items;
 
-interface DispatchProps extends TodoManagerProps {
-    onCreate: (title: string) => Action<string>;
-    onUpdate: (data: Partial<TodoItemProps>) =>
-        Action<Partial<TodoItemProps>>;
-    onDelete: (id: string) => Action<string>;
-}
-
-function mapStateToProps(
-    state: AppState, ownProps: OwnProps
-): StateProps {
     return {
-        ...ownProps,
-        items: state.todos.items,
+        items: Object.keys(items).map(id => items[id]),
     };
 }
 
-function mapDispatchToProps(
-    dispatch: Dispatch<AppState>,
-    ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch<AppState>): Handlers {
     return {
-        ...ownProps,
-        onCreate: (title: string) => dispatch(createTodo(title)),
-        onUpdate: (data: Partial<TodoItemProps>) =>
-            dispatch(updateTodo(data)),
-        onDelete: (id: string) => dispatch(deleteTodo(id)),
+        onCreate: (title: string) => dispatch(todoCreate(title)),
+        onUpdate: (id: string, data: Partial<TodoItem>) =>
+            dispatch(todoUpdate({id, data})),
+        onDelete: (id: string) => dispatch(todoDelete(id)),
     };
 }
 
-const ConnectedTodoManager = connect<object, object, object>(
+export default connect(
     mapStateToProps,
     mapDispatchToProps,
 )(TodoManager);
-
-export default ConnectedTodoManager;
