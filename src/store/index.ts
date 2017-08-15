@@ -1,8 +1,13 @@
-import { combineReducers, Reducer } from 'redux';
+import {
+    Reducer, combineReducers,
+    Store, createStore,
+    applyMiddleware,
+} from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import { fork, all } from 'redux-saga/effects';
 
 import { TodoList, todos } from './todos';
-import initialState from './initialState';
-import { Store, createStore } from 'redux';
+import todosRoot from './todos/sagas';
 
 export {
     AppState,
@@ -17,7 +22,17 @@ const rootReducer: Reducer<AppState> = combineReducers<AppState>({
     todos,
 });
 
+const sagaMiddleware = createSagaMiddleware();
+
 const store: Store<AppState> = createStore(
     rootReducer,
-    initialState
+    {todos: {items: {}, lastId: 0}},
+    applyMiddleware(sagaMiddleware),
 );
+sagaMiddleware.run(rootSaga);
+
+function* rootSaga() {
+    yield all([
+        fork(todosRoot),
+    ]);
+}

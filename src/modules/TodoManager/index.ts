@@ -2,9 +2,12 @@ import { connect, Dispatch } from 'react-redux';
 
 import { AppState } from '../../store';
 import { TodoItem,
-    todoCreate, todoUpdate, todoDelete } from '../../store/todos';
+    todoInit, todoCreate, todoUpdate, todoDelete
+} from '../../store/todos';
 
 import { TodoManager, Props, Handlers } from './component';
+
+let shouldFetch = true;
 
 function mapStateToProps(state: AppState): Props {
     const items = state.todos.items;
@@ -15,11 +18,17 @@ function mapStateToProps(state: AppState): Props {
 }
 
 function mapDispatchToProps(dispatch: Dispatch<AppState>): Handlers {
+    // hack
+    if (shouldFetch) {
+        shouldFetch = false;
+        dispatch( todoInit({}) );
+    }
+
     return {
-        onCreate: (title: string) => dispatch(todoCreate(title)),
+        onCreate: (title: string) => dispatch( todoCreate(title) ),
         onUpdate: (id: string, data: Partial<TodoItem>) =>
-            dispatch(todoUpdate({id, data})),
-        onDelete: (id: string) => dispatch(todoDelete(id)),
+            dispatch( todoUpdate({id, data}) ),
+        onDelete: (id: string) => dispatch( todoDelete(id) ),
     };
 }
 
